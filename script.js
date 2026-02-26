@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'btt_pro_ultimate_repo';
+const STORAGE_KEY = 'btt_pro_final_repo';
 let gameData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 let currentMode = 'auto';
 
@@ -7,12 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderData();
 });
 
-// FUNGSI SMART RESET & AUTO-FILL
 function checkUID(uid) {
     const data = gameData[uid];
     const nameInput = document.getElementById('charName');
     const heroSelects = document.querySelectorAll('.hero-select');
-
     if (uid.trim() === "" || !data) {
         nameInput.value = "";
         heroSelects.forEach(s => {
@@ -21,11 +19,9 @@ function checkUID(uid) {
         });
         return;
     }
-
     nameInput.value = data.nickname;
     if (data.history.length > 0) {
-        const lastEntry = data.history[data.history.length - 1];
-        const heroes = lastEntry.heroes;
+        const heroes = data.history[data.history.length - 1].heroes;
         ['infantry', 'lancer', 'marksman'].forEach(cls => {
             if (heroes[cls]) {
                 document.getElementById(`${cls}Name`).value = heroes[cls].name;
@@ -102,7 +98,6 @@ function saveData() {
     uidI.value = ""; checkUID(""); noteI.value = ""; dmgI.forEach(i => i.value = "");
 }
 
-// TOGGLE DETAIL & LAZY CHART
 function toggleDetail(uid) {
     const content = document.getElementById(`detail-${uid}`);
     const isVisible = content.style.display === "block";
@@ -151,7 +146,10 @@ function renderData() {
                     ${hist.map(e => `
                         <div class="history-item">
                             <button class="btn-delete-item" onclick="deleteRow('${uid}', '${e.date}')">✕</button>
-                            <div class="history-header"><span class="history-date small fw-bold text-muted">${e.date}</span><div class="fw-800 text-primary">${e.damage.toLocaleString('id-ID')}</div></div>
+                            <div class="history-header">
+                                <span class="history-date">${e.date}</span>
+                            </div>
+                            <span class="history-peak-val">${e.damage.toLocaleString('id-ID')}</span>
                             <div class="mb-2">
                                 ${e.heroes.infantry ? `<span class="hero-tag tag-inf">🛡️ ${e.heroes.infantry.name} ${e.heroes.infantry.star}⭐ ${e.heroes.infantry.tier} (+${e.heroes.infantry.widget})</span>` : ''}
                                 ${e.heroes.lancer ? `<span class="hero-tag tag-lan">🐎 ${e.heroes.lancer.name} ${e.heroes.lancer.star}⭐ ${e.heroes.lancer.tier} (+${e.heroes.lancer.widget})</span>` : ''}
@@ -178,7 +176,6 @@ function exportFullBackup() {
     const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = fileName; link.click();
 }
 
-// LOGIKA IMPORT DENGAN SMART MERGE
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -188,14 +185,10 @@ function importData(event) {
             const imported = JSON.parse(e.target.result);
             if(confirm("Gabungkan data backup? UID yang sama akan diperbarui.")) {
                 for (let uid in imported) {
-                    if (gameData[uid]) { 
-                        gameData[uid].nickname = imported[uid].nickname; 
-                        gameData[uid].history = imported[uid].history; 
-                    } else {
-                        gameData[uid] = imported[uid];
-                    }
+                    if (gameData[uid]) { gameData[uid].nickname = imported[uid].nickname; gameData[uid].history = imported[uid].history; }
+                    else gameData[uid] = imported[uid];
                 }
-                saveToLocal(); renderData(); alert("Gabung Data Berhasil!");
+                saveToLocal(); renderData(); alert("Berhasil!");
             }
         } catch (err) { alert("File tidak valid!"); }
     };
