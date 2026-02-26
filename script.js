@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'btt_pro_ultimate_v1';
+const STORAGE_KEY = 'btt_pro_ultimate_repo';
 let gameData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 let currentMode = 'auto';
 
@@ -7,29 +7,33 @@ document.addEventListener('DOMContentLoaded', () => {
     renderData();
 });
 
-// AUTO-FILL & SMART RESET
+// FUNGSI SMART RESET & AUTO-FILL
 function checkUID(uid) {
     const data = gameData[uid];
     const nameInput = document.getElementById('charName');
+    const heroSelects = document.querySelectorAll('.hero-select');
+
     if (uid.trim() === "" || !data) {
         nameInput.value = "";
-        document.querySelectorAll('.hero-select').forEach(s => {
+        heroSelects.forEach(s => {
             s.selectedIndex = 0;
             if(s.id.includes('Star')) toggleTier(s.id.replace('Star', ''));
         });
         return;
     }
+
     nameInput.value = data.nickname;
     if (data.history.length > 0) {
-        const heroes = data.history[data.history.length - 1].heroes;
+        const lastEntry = data.history[data.history.length - 1];
+        const heroes = lastEntry.heroes;
         ['infantry', 'lancer', 'marksman'].forEach(cls => {
             if (heroes[cls]) {
                 document.getElementById(`${cls}Name`).value = heroes[cls].name;
                 document.getElementById(`${cls}Star`).value = heroes[cls].star;
                 document.getElementById(`${cls}Widget`).value = heroes[cls].widget;
-                const tier = document.getElementById(`${cls}Tier`);
-                if (heroes[cls].star === "5") tier.value = "MAX";
-                else tier.value = heroes[cls].tier || "0";
+                const ts = document.getElementById(`${cls}Tier`);
+                if (heroes[cls].star === "5") ts.value = "MAX";
+                else ts.value = heroes[cls].tier || "0";
                 toggleTier(cls);
             }
         });
@@ -98,7 +102,7 @@ function saveData() {
     uidI.value = ""; checkUID(""); noteI.value = ""; dmgI.forEach(i => i.value = "");
 }
 
-// TOGGLE DETAIL & RENDER CHART
+// TOGGLE DETAIL & LAZY CHART
 function toggleDetail(uid) {
     const content = document.getElementById(`detail-${uid}`);
     const isVisible = content.style.display === "block";
@@ -138,7 +142,7 @@ function renderData() {
         card.className = 'glass-card mb-3 p-0 overflow-hidden shadow-sm';
         card.innerHTML = `
             <div class="char-row-header" onclick="toggleDetail('${uid}')">
-                <div><small class="text-muted d-block">UID: ${uid}</small><span class="fw-bold">${d.nickname}</span></div>
+                <div><small class="text-muted d-block" style="font-size:0.6rem">UID: ${uid}</small><span class="fw-bold">${d.nickname}</span></div>
                 <div class="text-end"><span class="peak-badge-mini">${peak.toLocaleString('id-ID')}</span><i class="ms-2 small opacity-50">▼</i></div>
             </div>
             <div id="detail-${uid}" class="char-details-content">
@@ -147,18 +151,18 @@ function renderData() {
                     ${hist.map(e => `
                         <div class="history-item">
                             <button class="btn-delete-item" onclick="deleteRow('${uid}', '${e.date}')">✕</button>
-                            <div class="history-header"><span class="history-date small fw-bold">${e.date}</span><div class="fw-800 text-primary">${e.damage.toLocaleString('id-ID')}</div></div>
+                            <div class="history-header"><span class="history-date small fw-bold text-muted">${e.date}</span><div class="fw-800 text-primary">${e.damage.toLocaleString('id-ID')}</div></div>
                             <div class="mb-2">
-                                ${e.heroes.infantry ? `<span class="hero-tag tag-inf">🛡️ ${e.heroes.infantry.name} ${e.heroes.infantry.star}⭐ ${e.heroes.infantry.tier}</span>` : ''}
-                                ${e.heroes.lancer ? `<span class="hero-tag tag-lan">🐎 ${e.heroes.lancer.name} ${e.heroes.lancer.star}⭐ ${e.heroes.lancer.tier}</span>` : ''}
-                                ${e.heroes.marksman ? `<span class="hero-tag tag-mar">🏹 ${e.heroes.marksman.name} ${e.heroes.marksman.star}⭐ ${e.heroes.marksman.tier}</span>` : ''}
+                                ${e.heroes.infantry ? `<span class="hero-tag tag-inf">🛡️ ${e.heroes.infantry.name} ${e.heroes.infantry.star}⭐ ${e.heroes.infantry.tier} (+${e.heroes.infantry.widget})</span>` : ''}
+                                ${e.heroes.lancer ? `<span class="hero-tag tag-lan">🐎 ${e.heroes.lancer.name} ${e.heroes.lancer.star}⭐ ${e.heroes.lancer.tier} (+${e.heroes.lancer.widget})</span>` : ''}
+                                ${e.heroes.marksman ? `<span class="hero-tag tag-mar">🏹 ${e.heroes.marksman.name} ${e.heroes.marksman.star}⭐ ${e.heroes.marksman.tier} (+${e.heroes.marksman.widget})</span>` : ''}
                             </div>
                             <div class="rounds-container">${e.rounds.map(r => `<div class="damage-pill">${r.toLocaleString('id-ID')}</div>`).join('')}</div>
                             ${e.note !== "-" ? `<div class="note-box mt-2">📝 ${e.note}</div>` : ''}
                         </div>
                     `).join('')}
                 </div>
-                <button class="btn btn-sm text-danger w-100 mt-3 fw-bold" onclick="deleteChar('${uid}')">Hapus Karakter</button>
+                <button class="btn btn-sm text-danger w-100 mt-3 fw-bold" onclick="deleteChar('${uid}')">Hapus Karakter Permanen</button>
             </div>`;
         container.appendChild(card);
     });
@@ -174,6 +178,7 @@ function exportFullBackup() {
     const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = fileName; link.click();
 }
 
+// LOGIKA IMPORT DENGAN SMART MERGE
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -181,14 +186,18 @@ function importData(event) {
     reader.onload = (e) => {
         try {
             const imported = JSON.parse(e.target.result);
-            if(confirm("Gabungkan data backup?")) {
+            if(confirm("Gabungkan data backup? UID yang sama akan diperbarui.")) {
                 for (let uid in imported) {
-                    if (gameData[uid]) { gameData[uid].nickname = imported[uid].nickname; gameData[uid].history = imported[uid].history; }
-                    else gameData[uid] = imported[uid];
+                    if (gameData[uid]) { 
+                        gameData[uid].nickname = imported[uid].nickname; 
+                        gameData[uid].history = imported[uid].history; 
+                    } else {
+                        gameData[uid] = imported[uid];
+                    }
                 }
-                saveToLocal(); renderData(); alert("Berhasil!");
+                saveToLocal(); renderData(); alert("Gabung Data Berhasil!");
             }
-        } catch (err) { alert("File rusak!"); }
+        } catch (err) { alert("File tidak valid!"); }
     };
     reader.readAsText(file);
     event.target.value = '';
