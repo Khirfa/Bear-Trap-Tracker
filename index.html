@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTT Pro - Optimized</title>
+    <title>Bear Trap Tracker</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -27,13 +27,13 @@
 
 <div class="container container-custom">
     <div class="glass-card mb-5">
-        <div class="section-title"><span>—</span> INPUT DATA <span>—</span></div>
+        <div class="section-title"><span>—</span> INPUT DATA SERANGAN <span>—</span></div>
         <div class="row justify-content-center">
             <div class="col-md-11">
                 <div class="row g-3 mb-4 text-center">
                     <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">UID</label>
-                        <input type="text" id="charUID" class="form-control text-center" placeholder="Ketik UID..." oninput="checkUID(this.value)">
+                        <label class="form-label small fw-bold text-muted">UID (ID UNIK)</label>
+                        <input type="text" id="charUID" class="form-control text-center" placeholder="ID Pemain (Smart Fill)" oninput="checkUID(this.value)">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-bold text-muted">NICKNAME</label>
@@ -44,7 +44,7 @@
                 <hr class="my-4 opacity-50">
 
                 <div class="mb-4">
-                    <label class="form-label d-block small fw-bold text-muted text-center mb-3">FORMASI HERO</label>
+                    <label class="form-label d-block small fw-bold text-muted text-center mb-3">FORMASI HERO (3 HERO)</label>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="hero-input-card bg-infantry">
@@ -66,10 +66,11 @@
                                     </div>
                                 </div>
                                 <select id="infantryWidget" class="form-select form-select-sm mt-2 hero-select">
-                                    ${Array.from({length: 11}, (_, i) => `<option value="${i}">Widget +${i}</option>`).join('')}
+                                    <option value="0">Widget +0</option><option value="1">Widget +1</option><option value="2">Widget +2</option><option value="3">Widget +3</option><option value="4">Widget +4</option><option value="5">Widget +5</option><option value="6">Widget +6</option><option value="7">Widget +7</option><option value="8">Widget +8</option><option value="9">Widget +9</option><option value="10">Widget +10</option>
                                 </select>
                             </div>
                         </div>
+
                         <div class="col-md-4">
                             <div class="hero-input-card bg-lancer">
                                 <label class="hero-class-label">🐎 LANCER</label>
@@ -90,10 +91,11 @@
                                     </div>
                                 </div>
                                 <select id="lancerWidget" class="form-select form-select-sm mt-2 hero-select">
-                                    ${Array.from({length: 11}, (_, i) => `<option value="${i}">Widget +${i}</option>`).join('')}
+                                    <option value="0">Widget +0</option><option value="1">Widget +1</option><option value="2">Widget +2</option><option value="3">Widget +3</option><option value="4">Widget +4</option><option value="5">Widget +5</option><option value="6">Widget +6</option><option value="7">Widget +7</option><option value="8">Widget +8</option><option value="9">Widget +9</option><option value="10">Widget +10</option>
                                 </select>
                             </div>
                         </div>
+
                         <div class="col-md-4">
                             <div class="hero-input-card bg-marksman">
                                 <label class="hero-class-label">🏹 MARKSMAN</label>
@@ -114,7 +116,7 @@
                                     </div>
                                 </div>
                                 <select id="marksmanWidget" class="form-select form-select-sm mt-2 hero-select">
-                                    ${Array.from({length: 11}, (_, i) => `<option value="${i}">Widget +${i}</option>`).join('')}
+                                    <option value="0">Widget +0</option><option value="1">Widget +1</option><option value="2">Widget +2</option><option value="3">Widget +3</option><option value="4">Widget +4</option><option value="5">Widget +5</option><option value="6">Widget +6</option><option value="7">Widget +7</option><option value="8">Widget +8</option><option value="9">Widget +9</option><option value="10">Widget +10</option>
                                 </select>
                             </div>
                         </div>
@@ -123,7 +125,7 @@
 
                 <div class="mb-4">
                     <label class="form-label d-block small fw-bold text-muted text-center">TANGGAL & DAMAGE</label>
-                    <div class="nav-pills-custom mb-2 d-flex justify-content-center">
+                    <div class="nav-pills-custom mb-3 d-flex justify-content-center">
                         <div id="btnAuto" class="nav-link active" onclick="setDateMode('auto')">Auto</div>
                         <div id="btnManual" class="nav-link" onclick="setDateMode('manual')">Manual</div>
                     </div>
@@ -131,11 +133,11 @@
                     <div id="manualContainer" class="d-none mb-3">
                         <input type="date" id="manualDateInput" class="form-control text-center">
                     </div>
-                    <div class="round-row"><span class="round-label">R1</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R2</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R3</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R4</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R5</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R1</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R2</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R3</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R4</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R5</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
                 </div>
 
                 <div class="mb-4">
@@ -143,7 +145,7 @@
                     <input type="text" id="charNote" class="form-control text-center" placeholder="Keterangan Tambahan...">
                 </div>
 
-                <button class="btn btn-update shadow-sm" onclick="saveData()">UPDATE PROGRESS</button>
+                <button class="btn btn-update shadow-sm" onclick="saveData()">UPDATE DATA</button>
             </div>
         </div>
     </div>
@@ -151,7 +153,7 @@
     <div class="glass-card mb-4 p-3 shadow-sm sticky-top" style="top: 10px; z-index: 100;">
         <div class="input-group">
             <span class="input-group-text bg-white border-end-0">🔍</span>
-            <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Cari Nickname atau UID..." oninput="renderData()">
+            <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Cari UID atau Nickname..." oninput="renderData()">
         </div>
         <div id="searchStats" class="text-center small text-muted mt-2 fw-bold"></div>
     </div>
