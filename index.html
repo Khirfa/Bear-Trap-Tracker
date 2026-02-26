@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bear Trap Tracker Pro - Smart Reset Edition</title>
+    <title>BTT Pro - Optimized</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,22 +18,22 @@
     <div class="container d-flex justify-content-between align-items-center">
         <span class="navbar-brand fw-bold text-primary">BEAR TRAP <span class="text-dark">TRACKER</span></span>
         <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-primary fw-bold px-3" onclick="exportFullBackup()">📦 Backup All</button>
+            <button class="btn btn-sm btn-outline-primary fw-bold px-3" onclick="exportFullBackup()">📦 Backup</button>
             <button class="btn btn-sm btn-light fw-bold" onclick="document.getElementById('importFile').click()">📤 Import</button>
-            <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+            <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
         </div>
     </div>
 </nav>
 
 <div class="container container-custom">
     <div class="glass-card mb-5">
-        <div class="section-title"><span>—</span> INPUT DATA SERANGAN <span>—</span></div>
+        <div class="section-title"><span>—</span> INPUT DATA <span>—</span></div>
         <div class="row justify-content-center">
             <div class="col-md-11">
                 <div class="row g-3 mb-4 text-center">
                     <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">UID (ID UNIK)</label>
-                        <input type="text" id="charUID" class="form-control text-center" placeholder="ID Pemain (Smart Fill)" oninput="checkUID(this.value)">
+                        <label class="form-label small fw-bold text-muted">UID</label>
+                        <input type="text" id="charUID" class="form-control text-center" placeholder="Ketik UID..." oninput="checkUID(this.value)">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-bold text-muted">NICKNAME</label>
@@ -44,115 +44,118 @@
                 <hr class="my-4 opacity-50">
 
                 <div class="mb-4">
-                    <label class="form-label d-block small fw-bold text-muted text-center mb-3">FORMASI HERO (3 HERO)</label>
+                    <label class="form-label d-block small fw-bold text-muted text-center mb-3">FORMASI HERO</label>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="hero-input-card bg-infantry">
                                 <label class="hero-class-label">🛡️ INFANTRY</label>
-                                <select id="infantryName" class="form-select form-select-sm mb-2 text-center hero-select">
-                                    <option value="">-- Pilih Hero --</option>
+                                <select id="infantryName" class="form-select form-select-sm mb-2 hero-select">
+                                    <option value="">-- Pilih --</option>
                                     <option>Sergey</option><option>Natalia</option><option>Jeronimo</option><option>Flint</option><option>Logan</option><option>Ahmose</option><option>Hector</option><option>WuMing</option><option>Edith</option><option>Gatot</option><option>Magnus</option><option>Gregory</option><option>Eleonora</option><option>Hervor</option><option>Gisela</option><option>Elif</option><option>Hank</option>
                                 </select>
                                 <div class="row g-1">
-                                    <div class="col-6 transition-all" id="infantryStarCol">
-                                        <select id="infantryStar" class="form-select form-select-sm text-center hero-select" onchange="toggleTier('infantry')">
+                                    <div class="col-6" id="infantryStarCol">
+                                        <select id="infantryStar" class="form-select form-select-sm hero-select" onchange="toggleTier('infantry')">
                                             <option value="1">1 ⭐</option><option value="2">2 ⭐</option><option value="3">3 ⭐</option><option value="4">4 ⭐</option><option value="5">5 ⭐</option>
                                         </select>
                                     </div>
-                                    <div class="col-6 transition-all" id="infantryTierCol">
-                                        <select id="infantryTier" class="form-select form-select-sm text-center hero-select">
+                                    <div class="col-6" id="infantryTierCol">
+                                        <select id="infantryTier" class="form-select form-select-sm hero-select">
                                             <option value="0">T0</option><option value="1">T1</option><option value="2">T2</option><option value="3">T3</option><option value="4">T4</option><option value="5">T5</option>
                                         </select>
                                     </div>
                                 </div>
-                                <select id="infantryWidget" class="form-select form-select-sm mt-2 text-center hero-select">
-                                    <option value="0">Widget +0</option><option value="1">Widget +1</option><option value="2">Widget +2</option><option value="3">Widget +3</option><option value="4">Widget +4</option><option value="5">Widget +5</option><option value="6">Widget +6</option><option value="7">Widget +7</option><option value="8">Widget +8</option><option value="9">Widget +9</option><option value="10">Widget +10</option>
+                                <select id="infantryWidget" class="form-select form-select-sm mt-2 hero-select">
+                                    ${Array.from({length: 11}, (_, i) => `<option value="${i}">Widget +${i}</option>`).join('')}
                                 </select>
                             </div>
                         </div>
-
                         <div class="col-md-4">
                             <div class="hero-input-card bg-lancer">
                                 <label class="hero-class-label">🐎 LANCER</label>
-                                <select id="lancerName" class="form-select form-select-sm mb-2 text-center hero-select">
-                                    <option value="">-- Pilih Hero --</option>
+                                <select id="lancerName" class="form-select form-select-sm mb-2 hero-select">
+                                    <option value="">-- Pilih --</option>
                                     <option>Molly</option><option>Philly</option><option>Mia</option><option>Reina</option><option>Norah</option><option>Renee</option><option>Gordon</option><option>Sonya</option><option>Fred</option><option>Freya</option><option>Lloyd</option><option>Karol</option><option>Flora</option><option>Dominic</option><option>Estrella</option>
                                 </select>
                                 <div class="row g-1">
-                                    <div class="col-6 transition-all" id="lancerStarCol">
-                                        <select id="lancerStar" class="form-select form-select-sm text-center hero-select" onchange="toggleTier('lancer')">
+                                    <div class="col-6" id="lancerStarCol">
+                                        <select id="lancerStar" class="form-select form-select-sm hero-select" onchange="toggleTier('lancer')">
                                             <option value="1">1 ⭐</option><option value="2">2 ⭐</option><option value="3">3 ⭐</option><option value="4">4 ⭐</option><option value="5">5 ⭐</option>
                                         </select>
                                     </div>
-                                    <div class="col-6 transition-all" id="lancerTierCol">
-                                        <select id="lancerTier" class="form-select form-select-sm text-center hero-select">
+                                    <div class="col-6" id="lancerTierCol">
+                                        <select id="lancerTier" class="form-select form-select-sm hero-select">
                                             <option value="0">T0</option><option value="1">T1</option><option value="2">T2</option><option value="3">T3</option><option value="4">T4</option><option value="5">T5</option>
                                         </select>
                                     </div>
                                 </div>
-                                <select id="lancerWidget" class="form-select form-select-sm mt-2 text-center hero-select">
-                                    <option value="0">Widget +0</option><option value="1">Widget +1</option><option value="2">Widget +2</option><option value="3">Widget +3</option><option value="4">Widget +4</option><option value="5">Widget +5</option><option value="6">Widget +6</option><option value="7">Widget +7</option><option value="8">Widget +8</option><option value="9">Widget +9</option><option value="10">Widget +10</option>
+                                <select id="lancerWidget" class="form-select form-select-sm mt-2 hero-select">
+                                    ${Array.from({length: 11}, (_, i) => `<option value="${i}">Widget +${i}</option>`).join('')}
                                 </select>
                             </div>
                         </div>
-
                         <div class="col-md-4">
                             <div class="hero-input-card bg-marksman">
                                 <label class="hero-class-label">🏹 MARKSMAN</label>
-                                <select id="marksmanName" class="form-select form-select-sm mb-2 text-center hero-select">
-                                    <option value="">-- Pilih Hero --</option>
+                                <select id="marksmanName" class="form-select form-select-sm mb-2 hero-select">
+                                    <option value="">-- Pilih --</option>
                                     <option>Bahiti</option><option>Zinman</option><option>Alonso</option><option>Greg</option><option>Lynn</option><option>Gwen</option><option>Wayne</option><option>Bradley</option><option>Hendrik</option><option>Xura</option><option>Blanchette</option><option>Rufus</option><option>Ligeia</option><option>Vulcanus</option><option>Cara</option><option>Viveca</option>
                                 </select>
                                 <div class="row g-1">
-                                    <div class="col-6 transition-all" id="marksmanStarCol">
-                                        <select id="marksmanStar" class="form-select form-select-sm text-center hero-select" onchange="toggleTier('marksman')">
+                                    <div class="col-6" id="marksmanStarCol">
+                                        <select id="marksmanStar" class="form-select form-select-sm hero-select" onchange="toggleTier('marksman')">
                                             <option value="1">1 ⭐</option><option value="2">2 ⭐</option><option value="3">3 ⭐</option><option value="4">4 ⭐</option><option value="5">5 ⭐</option>
                                         </select>
                                     </div>
-                                    <div class="col-6 transition-all" id="marksmanTierCol">
-                                        <select id="marksmanTier" class="form-select form-select-sm text-center hero-select">
+                                    <div class="col-6" id="marksmanTierCol">
+                                        <select id="marksmanTier" class="form-select form-select-sm hero-select">
                                             <option value="0">T0</option><option value="1">T1</option><option value="2">T2</option><option value="3">T3</option><option value="4">T4</option><option value="5">T5</option>
                                         </select>
                                     </div>
                                 </div>
-                                <select id="marksmanWidget" class="form-select form-select-sm mt-2 text-center hero-select">
-                                    <option value="0">Widget +0</option><option value="1">Widget +1</option><option value="2">Widget +2</option><option value="3">Widget +3</option><option value="4">Widget +4</option><option value="5">Widget +5</option><option value="6">Widget +6</option><option value="7">Widget +7</option><option value="8">Widget +8</option><option value="9">Widget +9</option><option value="10">Widget +10</option>
+                                <select id="marksmanWidget" class="form-select form-select-sm mt-2 hero-select">
+                                    ${Array.from({length: 11}, (_, i) => `<option value="${i}">Widget +${i}</option>`).join('')}
                                 </select>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="mb-3 text-center">
-                    <label class="form-label d-block small fw-bold text-muted">TANGGAL</label>
-                    <div class="nav-pills-custom mb-2">
-                        <div id="btnAuto" class="nav-link active" onclick="setDateMode('auto')">Auto</div>
-                        <div id="btnManual" class="nav-link" onclick="setDateMode('manual')">Manual</div>
-                    </div>
-                    <div id="autoContainer" class="form-control bg-light text-muted border-0 small text-center">-- -- ----</div>
-                    <div id="manualContainer" class="d-none">
-                        <input type="date" id="manualDateInput" class="form-control text-center">
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label d-block small fw-bold text-muted text-center">DAMAGE PER RONDE</label>
-                    <div class="round-row"><span class="round-label">R1</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R2</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R3</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R4</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R5</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <label class="form-label d-block small fw-bold text-muted text-center">TANGGAL & DAMAGE</label>
+                    <div class="nav-pills-custom mb-2 d-flex justify-content-center">
+                        <div id="btnAuto" class="nav-link active" onclick="setDateMode('auto')">Auto</div>
+                        <div id="btnManual" class="nav-link" onclick="setDateMode('manual')">Manual</div>
+                    </div>
+                    <div id="autoContainer" class="form-control bg-light text-muted border-0 small text-center mb-3">-- -- ----</div>
+                    <div id="manualContainer" class="d-none mb-3">
+                        <input type="date" id="manualDateInput" class="form-control text-center">
+                    </div>
+                    <div class="round-row"><span class="round-label">R1</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R2</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R3</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R4</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R5</span><input type="text" class="form-control dmg-input" oninput="formatNumber(this)"></div>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label small fw-bold text-muted d-block text-center">CATATAN</label>
-                    <input type="text" id="charNote" class="form-control text-center" placeholder="Opsional: Buff / State ...">
+                    <input type="text" id="charNote" class="form-control text-center" placeholder="Keterangan Tambahan...">
                 </div>
 
-                <button class="btn btn-update shadow-sm" onclick="saveData()">UPDATE DATA</button>
+                <button class="btn btn-update shadow-sm" onclick="saveData()">UPDATE PROGRESS</button>
             </div>
         </div>
     </div>
+
+    <div class="glass-card mb-4 p-3 shadow-sm sticky-top" style="top: 10px; z-index: 100;">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">🔍</span>
+            <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Cari Nickname atau UID..." oninput="renderData()">
+        </div>
+        <div id="searchStats" class="text-center small text-muted mt-2 fw-bold"></div>
+    </div>
+
     <div id="displayArea"></div>
 </div>
 
