@@ -239,23 +239,6 @@ async function importViaText() {
     }
 }
 
-// Fungsi proses yang dipisahkan agar bisa dipakai Import File & Paste Text
-function processImport(imported) {
-    // Validasi sederhana apakah ini data BTT
-    const uids = Object.keys(imported);
-    if (uids.length === 0) return alert("Data kosong!");
-
-    if(confirm(`Temukan ${uids.length} data karakter. Gabungkan dengan data sekarang?`)) {
-        for (let uid in imported) {
-            // Gabungkan atau timpa data lama
-            gameData[uid] = imported[uid];
-        }
-        saveToLocal();
-        renderData();
-        alert("Data berhasil diimpor!");
-    }
-}
-
 // Update juga fungsi importData lama Anda agar memakai processImport yang sama
 function importData(event) {
     const file = event.target.files[0];
@@ -271,4 +254,45 @@ function importData(event) {
     };
     reader.readAsText(file);
     event.target.value = '';
+}
+
+function handlePasteImport() {
+    const pasteArea = document.getElementById('pasteArea');
+    const backupCode = pasteArea.value.trim();
+    
+    if (!backupCode) {
+        alert("Silakan tempelkan kode terlebih dahulu!");
+        return;
+    }
+
+    try {
+        const imported = JSON.parse(backupCode);
+        
+        // Tutup modal menggunakan Bootstrap API
+        const modalElement = document.getElementById('pasteModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        
+        processImport(imported); // Menggunakan fungsi processImport yang sudah kita buat sebelumnya
+        
+        modalInstance.hide();
+        pasteArea.value = ""; // Bersihkan textarea
+    } catch (err) {
+        alert("Format kode salah! Pastikan Anda menyalin seluruh teks tanpa ada karakter yang terpotong.");
+        console.error(err);
+    }
+}
+
+// Pastikan fungsi processImport tersedia
+function processImport(imported) {
+    const uids = Object.keys(imported);
+    if (uids.length === 0) return alert("Data tidak ditemukan dalam kode tersebut.");
+
+    if(confirm(`Ditemukan ${uids.length} karakter. Gabungkan ke database?`)) {
+        for (let uid in imported) {
+            gameData[uid] = imported[uid];
+        }
+        saveToLocal();
+        renderData();
+        alert("Data berhasil diperbarui!");
+    }
 }
