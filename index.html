@@ -28,7 +28,7 @@
             <button class="btn btn-sm btn-outline-primary fw-bold px-3" onclick="exportFullBackup()">📦 Backup</button>
             <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
 			<div class="d-flex gap-2 align-items-center">
-				<button class="btn btn-sm btn-light fw-bold" onclick="importViaText()">📋 Paste</button>
+				<button class="btn btn-sm btn-light fw-bold" data-bs-toggle="modal" data-bs-target="#pasteModal">📋 Paste</button>
 				<button class="btn btn-sm btn-light fw-bold" onclick="document.getElementById('importFile').click()">📤 Import</button>
 				<input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
 			</div>
@@ -173,5 +173,23 @@
 </div>
 
 <script src="script.js"></script>
+<div class="modal fade" id="pasteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">📋 Paste Backup Code</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted mb-3">Tempelkan seluruh kode JSON yang Anda dapatkan dari fitur Share di sini.</p>
+                <textarea id="pasteArea" class="form-control" rows="8" style="border-radius: 12px; font-family: monospace; font-size: 0.8rem;" placeholder='Contoh: {"12345": {...}}'></textarea>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary fw-bold px-4" onclick="handlePasteImport()">Import Sekarang</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
