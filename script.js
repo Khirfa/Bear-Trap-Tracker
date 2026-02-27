@@ -170,27 +170,42 @@ window.deleteRow = (uid, date) => { if(confirm(`Hapus data ${date}?`)) { gameDat
 window.deleteChar = (uid) => { if(confirm(`Hapus permanen ${uid}?`)) { delete gameData[uid]; saveToLocal(); renderData(); } };
 
 async function exportFullBackup() {
+    const dataString = JSON.stringify(gameData);
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const fileName = `BTT_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}_${random}.json`;
-    const dataString = JSON.stringify(gameData, null, 2);
-    
-    // Cek apakah browser mendukung fitur Share File (Mobile)
-    if (navigator.canShare && navigator.share) {
+    const fileName = `BTT_Backup_${random}.json`;
+
+    // 1. Deteksi apakah ini perangkat Mobile atau PWA
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile && navigator.share) {
+        // FITUR SHARE UNTUK HP (WA, DISCORD, DLL)
+        // Kita konversi data ke Base64 agar aman dikirim sebagai teks atau file
+        const blob = new Blob([dataString], { type: 'application/json' });
+        const file = new File([blob], fileName, { type: 'application/json' });
+
         try {
-            const file = new File([dataString], fileName, { type: "application/json" });
             await navigator.share({
-                files: [file],
-                title: 'Backup Bear Trap Tracker',
-                text: 'Data Backup BTT Pro'
+                title: 'BTT Pro Backup',
+                text: 'Ini adalah kode backup data Bear Trap Tracker saya.',
+                files: [file] // Mencoba share sebagai file dulu
             });
         } catch (err) {
-            // Jika share dibatalkan atau gagal, fallback ke download biasa
-            console.log("Share failed/cancelled, trying download...");
-            downloadFile(dataString, fileName);
+            // Jika share file gagal (beberapa HP melarang share .json), 
+            // kita gunakan fallback share via TEXT (Bisa di-paste ke WA/Discord)
+            const backupCode = btoa(dataString); // Ubah ke Base64
+            await navigator.share({
+                title: 'BTT Backup Code',
+                text: `KODE BACKUP BTT:\n\n${backupCode}\n\n(Salin kode di atas untuk Import)`
+            });
         }
     } else {
-        // Mode PC/Laptop atau Browser jadul
-        downloadFile(dataString, fileName);
+        // FITUR DOWNLOAD UNTUK WEB/DESKTOP
+        const blob = new Blob([dataString], { type: "application/json" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(link.href);
     }
 }
 
@@ -207,19 +222,40 @@ function downloadFile(content, fileName) {
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = (e) => {
+        let content = e.target.result;
         try {
-            const imported = JSON.parse(e.target.result);
-            if(confirm("Gabungkan data backup? UID yang sama akan diperbarui.")) {
-                for (let uid in imported) {
-                    if (gameData[uid]) { gameData[uid].nickname = imported[uid].nickname; gameData[uid].history = imported[uid].history; }
-                    else gameData[uid] = imported[uid];
-                }
-                saveToLocal(); renderData(); alert("Berhasil!");
+            // Cek apakah kontennya Base64 (dari hasil share teks) atau JSON biasa
+            let imported;
+            if (content.startsWith('{')) {
+                imported = JSON.parse(content);
+            } else {
+                imported = JSON.parse(atob(content)); // Decode Base64
             }
-        } catch (err) { alert("File tidak valid!"); }
+            
+            processImport(imported);
+        } catch (err) {
+            alert("Format data tidak dikenal atau kode rusak!");
+        }
     };
     reader.readAsText(file);
     event.target.value = '';
+}
+
+function processImport(imported) {
+    if(confirm("Gabungkan data backup? UID yang sama akan diperbarui.")) {
+        for (let uid in imported) {
+            if (gameData[uid]) {
+                gameData[uid].nickname = imported[uid].nickname;
+                gameData[uid].history = imported[uid].history;
+            } else {
+                gameData[uid] = imported[uid];
+            }
+        }
+        saveToLocal();
+        renderData();
+        alert("Berhasil mengimpor data!");
+    }
 }
