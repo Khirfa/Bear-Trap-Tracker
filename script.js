@@ -225,43 +225,50 @@ function copyToClipboard(text) {
     });
 }
 
+async function importViaText() {
+    const backupCode = prompt("Tempel (Paste) kode backup JSON di sini:");
+    
+    if (!backupCode) return;
+
+    try {
+        // Cek apakah kode diawali '{' (JSON murni)
+        const imported = JSON.parse(backupCode.trim());
+        processImport(imported);
+    } catch (err) {
+        alert("Kode tidak valid! Pastikan Anda menyalin seluruh teks backup dengan benar.");
+    }
+}
+
+// Fungsi proses yang dipisahkan agar bisa dipakai Import File & Paste Text
+function processImport(imported) {
+    // Validasi sederhana apakah ini data BTT
+    const uids = Object.keys(imported);
+    if (uids.length === 0) return alert("Data kosong!");
+
+    if(confirm(`Temukan ${uids.length} data karakter. Gabungkan dengan data sekarang?`)) {
+        for (let uid in imported) {
+            // Gabungkan atau timpa data lama
+            gameData[uid] = imported[uid];
+        }
+        saveToLocal();
+        renderData();
+        alert("Data berhasil diimpor!");
+    }
+}
+
+// Update juga fungsi importData lama Anda agar memakai processImport yang sama
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (e) => {
-        let content = e.target.result;
         try {
-            // Cek apakah kontennya Base64 (dari hasil share teks) atau JSON biasa
-            let imported;
-            if (content.startsWith('{')) {
-                imported = JSON.parse(content);
-            } else {
-                imported = JSON.parse(atob(content)); // Decode Base64
-            }
-            
+            const imported = JSON.parse(e.target.result);
             processImport(imported);
         } catch (err) {
-            alert("Format data tidak dikenal atau kode rusak!");
+            alert("File tidak valid!");
         }
     };
     reader.readAsText(file);
     event.target.value = '';
-}
-
-function processImport(imported) {
-    if(confirm("Gabungkan data backup? UID yang sama akan diperbarui.")) {
-        for (let uid in imported) {
-            if (gameData[uid]) {
-                gameData[uid].nickname = imported[uid].nickname;
-                gameData[uid].history = imported[uid].history;
-            } else {
-                gameData[uid] = imported[uid];
-            }
-        }
-        saveToLocal();
-        renderData();
-        alert("Berhasil mengimpor data!");
-    }
 }
