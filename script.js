@@ -169,54 +169,60 @@ function renderData() {
 window.deleteRow = (uid, date) => { if(confirm(`Hapus data ${date}?`)) { gameData[uid].history = gameData[uid].history.filter(e => e.date !== date); if(gameData[uid].history.length === 0) delete gameData[uid]; saveToLocal(); renderData(); } };
 window.deleteChar = (uid) => { if(confirm(`Hapus permanen ${uid}?`)) { delete gameData[uid]; saveToLocal(); renderData(); } };
 
-async function exportFullBackup() {
-    const dataString = JSON.stringify(gameData);
+// FUNGSI BACKUP NORMAL (KHUSUS PC/DOWNLOAD)
+function exportFullBackup() {
+    const dataString = JSON.stringify(gameData, null, 2);
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const fileName = `BTT_Backup_${random}.json`;
-
-    // 1. Deteksi apakah ini perangkat Mobile atau PWA
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    if (isMobile && navigator.share) {
-        // FITUR SHARE UNTUK HP (WA, DISCORD, DLL)
-        // Kita konversi data ke Base64 agar aman dikirim sebagai teks atau file
-        const blob = new Blob([dataString], { type: 'application/json' });
-        const file = new File([blob], fileName, { type: 'application/json' });
-
-        try {
-            await navigator.share({
-                title: 'BTT Pro Backup',
-                text: 'Ini adalah kode backup data Bear Trap Tracker saya.',
-                files: [file] // Mencoba share sebagai file dulu
-            });
-        } catch (err) {
-            // Jika share file gagal (beberapa HP melarang share .json), 
-            // kita gunakan fallback share via TEXT (Bisa di-paste ke WA/Discord)
-            const backupCode = btoa(dataString); // Ubah ke Base64
-            await navigator.share({
-                title: 'BTT Backup Code',
-                text: `KODE BACKUP BTT:\n\n${backupCode}\n\n(Salin kode di atas untuk Import)`
-            });
-        }
-    } else {
-        // FITUR DOWNLOAD UNTUK WEB/DESKTOP
-        const blob = new Blob([dataString], { type: "application/json" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        link.click();
-        URL.revokeObjectURL(link.href);
-    }
-}
-
-// Fungsi pembantu untuk download konvensional
-function downloadFile(content, fileName) {
-    const blob = new Blob([content], { type: "application/json" });
+    const fileName = `BTT_PC_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}_${random}.json`;
+    
+    const blob = new Blob([dataString], { type: "application/json" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = fileName;
     link.click();
     URL.revokeObjectURL(link.href);
+}
+
+// FUNGSI SHARE MOBILE (KHUSUS APP MEDIAN/HP)
+async function shareDataMobile() {
+    const dataString = JSON.stringify(gameData, null, 2);
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const fileName = `BTT_Mobile_${random}.json`;
+
+    if (navigator.share) {
+        try {
+            // Coba share sebagai file (Ideal)
+            const file = new File([dataString], fileName, { type: "application/json" });
+            await navigator.share({
+                files: [file],
+                title: 'Backup BTT Pro',
+                text: 'Data Backup Bear Trap Tracker saya'
+            });
+        } catch (err) {
+            // Fallback: Share sebagai teks jika share file diblokir Median
+            try {
+                await navigator.share({
+                    title: 'BTT Backup Data',
+                    text: dataString 
+                });
+            } catch (textErr) {
+                // Jika semua gagal, copy ke clipboard
+                copyToClipboard(dataString);
+            }
+        }
+    } else {
+        // Jika dibuka di browser PC tapi klik tombol share
+        copyToClipboard(dataString);
+    }
+}
+
+// Fungsi bantu untuk Copy ke Clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Fitur Share tidak didukung. Data backup telah disalin ke CLIPBOARD. Silakan tempel (paste) di WA/Catatan.");
+    }).catch(() => {
+        alert("Gagal menyalin data.");
+    });
 }
 
 function importData(event) {
