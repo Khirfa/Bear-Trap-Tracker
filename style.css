@@ -1,298 +1,134 @@
-const STORAGE_KEY = 'btt_pro_final_repo';
-let gameData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-let currentMode = 'auto';
-
-document.addEventListener('DOMContentLoaded', () => {
-    updateClock();
-    renderData();
-});
-
-function checkUID(uid) {
-    const data = gameData[uid];
-    const nameInput = document.getElementById('charName');
-    const heroSelects = document.querySelectorAll('.hero-select');
-    if (uid.trim() === "" || !data) {
-        nameInput.value = "";
-        heroSelects.forEach(s => {
-            s.selectedIndex = 0;
-            if(s.id.includes('Star')) toggleTier(s.id.replace('Star', ''));
-        });
-        return;
-    }
-    nameInput.value = data.nickname;
-    if (data.history.length > 0) {
-        const heroes = data.history[data.history.length - 1].heroes;
-        ['infantry', 'lancer', 'marksman'].forEach(cls => {
-            if (heroes[cls]) {
-                document.getElementById(`${cls}Name`).value = heroes[cls].name;
-                document.getElementById(`${cls}Star`).value = heroes[cls].star;
-                document.getElementById(`${cls}Widget`).value = heroes[cls].widget;
-                const ts = document.getElementById(`${cls}Tier`);
-                if (heroes[cls].star === "5") ts.value = "MAX";
-                else ts.value = heroes[cls].tier || "0";
-                toggleTier(cls);
-            }
-        });
-    }
+:root {
+    --primary: #00BFFF;
+    --primary-dark: #0096c7;
+    --bg-body: #f4f7fa;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-function toggleTier(className) {
-    const star = document.getElementById(`${className}Star`).value;
-    const starCol = document.getElementById(`${className}StarCol`);
-    const tierCol = document.getElementById(`${className}TierCol`);
-    if (star === "5") {
-        tierCol.style.display = 'none';
-        starCol.className = "col-12 transition-all";
-    } else {
-        tierCol.style.display = 'block';
-        starCol.className = "col-6 transition-all";
-    }
+body { 
+    background-color: var(--bg-body);
+    color: #2d3748;
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    padding-bottom: 50px;
 }
 
-function setDateMode(mode) {
-    currentMode = mode;
-    document.getElementById('btnAuto').classList.toggle('active', mode === 'auto');
-    document.getElementById('btnManual').classList.toggle('active', mode === 'manual');
-    document.getElementById('autoContainer').classList.toggle('d-none', mode === 'manual');
-    document.getElementById('manualContainer').classList.toggle('d-none', mode === 'auto');
+/* Pastikan tombol primary memiliki warna yang pas */
+.btn-primary {
+    background-color: var(--primary);
+    border: none;
+    transition: all 0.2s ease;
 }
 
-function updateClock() {
-    const now = new Date();
-    const options = { day: '2-digit', month: 'short', year: 'numeric' };
-    document.getElementById('autoContainer').innerText = now.toLocaleDateString('id-ID', options);
-    if(!document.getElementById('manualDateInput').value) document.getElementById('manualDateInput').value = now.toISOString().split('T')[0];
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: scale(1.05); /* Sedikit membesar saat ditekan/hover */
 }
 
-function formatNumber(input) {
-    let v = input.value.replace(/\D/g, "");
-    input.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+/* Membuat tombol terlihat lebih modern di Median App */
+.btn-sm, .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-function parseNumber(str) { return parseFloat(str.replace(/\./g, "")) || 0; }
+.container-custom { max-width: 900px; margin: 0 auto; }
+.transition-all { transition: all 0.3s ease-in-out; }
 
-function saveToLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData)); }
-
-function getHeroData(cls) {
-    const name = document.getElementById(`${cls}Name`).value;
-    if(!name) return null;
-    const star = document.getElementById(`${cls}Star`).value;
-    return { name, star, tier: (star === "5" ? "MAX" : document.getElementById(`${cls}Tier`).value), widget: document.getElementById(`${cls}Widget`).value };
+.glass-card {
+    background: #ffffff; border: 1px solid #eef2f7; border-radius: 20px;
+    box-shadow: var(--card-shadow); padding: 24px; margin-bottom: 20px;
 }
 
-function saveData() {
-    const uidI = document.getElementById('charUID'), nameI = document.getElementById('charName'), noteI = document.getElementById('charNote'), dmgI = document.querySelectorAll('.dmg-input');
-    if (!uidI.value || !nameI.value) return alert("UID & Nickname wajib!");
-    const rd = Array.from(dmgI).map(i => parseNumber(i.value));
-    const highest = Math.max(...rd);
-    if (highest === 0) return alert("Isi damage!");
-    
-    let dk = currentMode === 'auto' ? document.getElementById('autoContainer').innerText : new Date(document.getElementById('manualDateInput').value).toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
-
-    if (!gameData[uidI.value]) gameData[uidI.value] = { nickname: nameI.value, history: [] };
-    else gameData[uidI.value].nickname = nameI.value;
-
-    gameData[uidI.value].history.push({ date: dk, damage: highest, rounds: rd, note: noteI.value || "-", heroes: { infantry: getHeroData('infantry'), lancer: getHeroData('lancer'), marksman: getHeroData('marksman') } });
-    
-    saveToLocal(); renderData();
-    uidI.value = ""; checkUID(""); noteI.value = ""; dmgI.forEach(i => i.value = "");
+.section-title {
+    font-size: 0.8rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.2px; color: #a0aec0; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
 }
 
-function toggleDetail(uid) {
-    const content = document.getElementById(`detail-${uid}`);
-    const isVisible = content.style.display === "block";
-    content.style.display = isVisible ? "none" : "block";
-    if (!isVisible) renderChart(uid);
+.hero-select {
+    text-align: center;
+    text-align-last: center;
+    font-weight: 600;
 }
 
-function renderChart(uid) {
-    const ctx = document.getElementById(`chart-${uid}`);
-    if (!ctx || ctx.getAttribute('data-done') === 'true') return;
-    const history = gameData[uid].history;
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: history.map(h => h.date),
-            datasets: [{
-                data: history.map(h => h.damage),
-                borderColor: '#00BFFF', borderWidth: 3, pointBackgroundColor: '#fff', fill: true, backgroundColor: 'rgba(0, 191, 255, 0.05)', tension: 0.3
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { font: { size: 8 } }, grid: { display: false } } } }
-    });
-    ctx.setAttribute('data-done', 'true');
+.hero-input-card { border-radius: 15px; padding: 12px; height: 100%; }
+.bg-infantry { background: #ebf8ff; border: 1px solid #bee3f8; }
+.bg-lancer { background: #fff5f5; border: 1px solid #feb2b2; }
+.bg-marksman { background: #f0fff4; border: 1px solid #9ae6b4; }
+
+.hero-class-label { display: block; text-align: center; font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; color: #4a5568; }
+
+/* List & Accordion */
+.char-row-header {
+    cursor: pointer; padding: 18px; display: flex; justify-content: space-between;
+    align-items: center; transition: 0.2s; background: #ffffff; border-radius: 15px;
+}
+.char-row-header:hover { background: #f8fafc; }
+
+.char-details-content { display: none; padding: 20px; border-top: 1px dashed #edf2f7; }
+
+.peak-badge-mini {
+    font-size: 0.75rem; background: var(--primary); color: white;
+    padding: 3px 12px; border-radius: 50px; font-weight: 700;
 }
 
-function renderData() {
-    const container = document.getElementById('displayArea'), search = document.getElementById('searchInput').value.toLowerCase(), stats = document.getElementById('searchStats'), uids = Object.keys(gameData);
-    if(uids.length === 0) { container.innerHTML = '<div class="glass-card text-center py-5">Belum ada data.</div>'; stats.innerText = ""; return; }
-    
-    const filtered = uids.filter(uid => uid.toLowerCase().includes(search) || gameData[uid].nickname.toLowerCase().includes(search));
-    stats.innerText = `Menampilkan ${filtered.length} dari ${uids.length} Karakter`;
-    container.innerHTML = '';
-    
-    filtered.forEach(uid => {
-        const d = gameData[uid], hist = [...d.history].sort((a,b) => new Date(b.date) - new Date(a.date)), peak = Math.max(...d.history.map(h => h.damage));
-        const card = document.createElement('div');
-        card.className = 'glass-card mb-3 p-0 overflow-hidden shadow-sm';
-        card.innerHTML = `
-            <div class="char-row-header" onclick="toggleDetail('${uid}')">
-                <div><small class="text-muted d-block" style="font-size:0.6rem">UID: ${uid}</small><span class="fw-bold">${d.nickname}</span></div>
-                <div class="text-end"><span class="peak-badge-mini">${peak.toLocaleString('id-ID')}</span><i class="ms-2 small opacity-50">▼</i></div>
-            </div>
-            <div id="detail-${uid}" class="char-details-content">
-                <div class="chart-wrapper mb-4" style="height: 160px;"><canvas id="chart-${uid}"></canvas></div>
-                <div class="history-timeline">
-                    ${hist.map(e => `
-                        <div class="history-item">
-                            <button class="btn-delete-item" onclick="deleteRow('${uid}', '${e.date}')">✕</button>
-                            <div class="history-header">
-                                <span class="history-date">${e.date}</span>
-                            </div>
-                            <span class="history-peak-val">${e.damage.toLocaleString('id-ID')}</span>
-                            <div class="mb-2">
-                                ${e.heroes.infantry ? `<span class="hero-tag tag-inf">🛡️ ${e.heroes.infantry.name} ${e.heroes.infantry.star}⭐ ${e.heroes.infantry.tier} (+${e.heroes.infantry.widget})</span>` : ''}
-                                ${e.heroes.lancer ? `<span class="hero-tag tag-lan">🐎 ${e.heroes.lancer.name} ${e.heroes.lancer.star}⭐ ${e.heroes.lancer.tier} (+${e.heroes.lancer.widget})</span>` : ''}
-                                ${e.heroes.marksman ? `<span class="hero-tag tag-mar">🏹 ${e.heroes.marksman.name} ${e.heroes.marksman.star}⭐ ${e.heroes.marksman.tier} (+${e.heroes.marksman.widget})</span>` : ''}
-                            </div>
-                            <div class="rounds-container">${e.rounds.map(r => `<div class="damage-pill">${r.toLocaleString('id-ID')}</div>`).join('')}</div>
-                            ${e.note !== "-" ? `<div class="note-box mt-2">📝 ${e.note}</div>` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-                <button class="btn btn-sm text-danger w-100 mt-3 fw-bold" onclick="deleteChar('${uid}')">Hapus Karakter Permanen</button>
-            </div>`;
-        container.appendChild(card);
-    });
+/* History Data Visuals */
+.history-item {
+    background: #ffffff; border-left: 5px solid var(--primary);
+    border-radius: 12px; padding: 15px; position: relative;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02); margin-bottom: 15px;
 }
 
-window.deleteRow = (uid, date) => { if(confirm(`Hapus data ${date}?`)) { gameData[uid].history = gameData[uid].history.filter(e => e.date !== date); if(gameData[uid].history.length === 0) delete gameData[uid]; saveToLocal(); renderData(); } };
-window.deleteChar = (uid) => { if(confirm(`Hapus permanen ${uid}?`)) { delete gameData[uid]; saveToLocal(); renderData(); } };
-
-// FUNGSI BACKUP NORMAL (KHUSUS PC/DOWNLOAD)
-function exportFullBackup() {
-    const dataString = JSON.stringify(gameData, null, 2);
-    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const fileName = `BTT_PC_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}_${random}.json`;
-    
-    const blob = new Blob([dataString], { type: "application/json" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    link.click();
-    URL.revokeObjectURL(link.href);
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    padding-right: 30px; /* Jarak untuk X */
 }
 
-// FUNGSI SHARE MOBILE (KHUSUS APP MEDIAN/HP)
-async function shareDataMobile() {
-    const dataString = JSON.stringify(gameData, null, 2);
-    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const fileName = `BTT_Mobile_${random}.json`;
-
-    if (navigator.share) {
-        try {
-            // Coba share sebagai file (Ideal)
-            const file = new File([dataString], fileName, { type: "application/json" });
-            await navigator.share({
-                files: [file],
-                title: 'Backup BTT Pro',
-                text: 'Data Backup Bear Trap Tracker saya'
-            });
-        } catch (err) {
-            // Fallback: Share sebagai teks jika share file diblokir Median
-            try {
-                await navigator.share({
-                    title: 'BTT Backup Data',
-                    text: dataString 
-                });
-            } catch (textErr) {
-                // Jika semua gagal, copy ke clipboard
-                copyToClipboard(dataString);
-            }
-        }
-    } else {
-        // Jika dibuka di browser PC tapi klik tombol share
-        copyToClipboard(dataString);
-    }
+.history-date {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #a0aec0;
 }
 
-// Fungsi bantu untuk Copy ke Clipboard
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert("Copas data ke WA atau catatan");
-    }).catch(() => {
-        alert("Gagal menyalin data.");
-    });
+.history-peak-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 10px;
 }
 
-async function importViaText() {
-    const backupCode = prompt("Tempel (Paste) kode backup JSON di sini:");
-    
-    if (!backupCode) return;
+/* Tag & Badges */
+.hero-tag {
+    display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px;
+    font-size: 0.7rem; font-weight: 700; margin-right: 5px; margin-bottom: 5px;
+}
+.tag-inf { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+.tag-lan { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+.tag-mar { background: #f0fff4; color: #2f855a; border: 1px solid #9ae6b4; }
 
-    try {
-        // Cek apakah kode diawali '{' (JSON murni)
-        const imported = JSON.parse(backupCode.trim());
-        processImport(imported);
-    } catch (err) {
-        alert("Kode tidak valid! Pastikan Anda menyalin seluruh teks backup dengan benar.");
-    }
+.round-row { display: flex; align-items: center; margin-bottom: 12px; gap: 15px; }
+.round-label { min-width: 35px; font-weight: 700; color: var(--primary); font-size: 0.85rem; }
+
+.form-control, .form-select { border-radius: 12px; border: 1.5px solid #edf2f7; padding: 10px 15px; }
+
+.damage-pill { background: #f8fafc; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; border: 1px solid #f1f5f9; }
+.rounds-container { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.btn-update { background: var(--primary); color: white; border: none; border-radius: 14px; padding: 15px; font-weight: 700; width: 100%; transition: 0.3s; cursor: pointer; }
+.nav-pills-custom { background: #edf2f7; padding: 4px; border-radius: 12px; display: inline-flex; }
+.nav-pills-custom .nav-link { padding: 6px 18px; font-size: 0.8rem; font-weight: 600; color: #718096; border-radius: 10px; cursor: pointer; }
+.nav-pills-custom .nav-link.active { background: white; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
+.btn-delete-item { 
+    position: absolute; top: 12px; right: 12px; width: 24px; height: 24px; 
+    background: #fee2e2; border: none; color: #ef4444; border-radius: 50%; 
+    font-size: 0.7rem; cursor: pointer; font-weight: bold;
 }
 
-// Update juga fungsi importData lama Anda agar memakai processImport yang sama
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const imported = JSON.parse(e.target.result);
-            processImport(imported);
-        } catch (err) {
-            alert("File tidak valid!");
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-}
+.note-box { font-size: 0.75rem; color: #718096; background: #fffdf5; padding: 8px; border-radius: 6px; border: 1px solid #fff5f5; }
 
-function handlePasteImport() {
-    const pasteArea = document.getElementById('pasteArea');
-    const backupCode = pasteArea.value.trim();
-    
-    if (!backupCode) {
-        alert("Silakan tempelkan kode terlebih dahulu!");
-        return;
-    }
-
-    try {
-        const imported = JSON.parse(backupCode);
-        
-        // Tutup modal menggunakan Bootstrap API
-        const modalElement = document.getElementById('pasteModal');
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        
-        processImport(imported); // Menggunakan fungsi processImport yang sudah kita buat sebelumnya
-        
-        modalInstance.hide();
-        pasteArea.value = ""; // Bersihkan textarea
-    } catch (err) {
-        alert("Format kode salah! Pastikan Anda menyalin seluruh teks tanpa ada karakter yang terpotong.");
-        console.error(err);
-    }
-}
-
-// Pastikan fungsi processImport tersedia
-function processImport(imported) {
-    const uids = Object.keys(imported);
-    if (uids.length === 0) return alert("Data tidak ditemukan dalam kode tersebut.");
-
-    if(confirm(`Ditemukan ${uids.length} karakter. Gabungkan ke database?`)) {
-        for (let uid in imported) {
-            gameData[uid] = imported[uid];
-        }
-        saveToLocal();
-        renderData();
-        alert("Data berhasil diperbarui!");
-    }
-}
+.search-sticky { top: 10px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important; }
