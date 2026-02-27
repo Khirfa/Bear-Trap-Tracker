@@ -169,11 +169,39 @@ function renderData() {
 window.deleteRow = (uid, date) => { if(confirm(`Hapus data ${date}?`)) { gameData[uid].history = gameData[uid].history.filter(e => e.date !== date); if(gameData[uid].history.length === 0) delete gameData[uid]; saveToLocal(); renderData(); } };
 window.deleteChar = (uid) => { if(confirm(`Hapus permanen ${uid}?`)) { delete gameData[uid]; saveToLocal(); renderData(); } };
 
-function exportFullBackup() {
+async function exportFullBackup() {
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
     const fileName = `BTT_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}_${random}.json`;
-    const blob = new Blob([JSON.stringify(gameData, null, 2)], { type: "application/json" });
-    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = fileName; link.click();
+    const dataString = JSON.stringify(gameData, null, 2);
+    
+    // Cek apakah browser mendukung fitur Share File (Mobile)
+    if (navigator.canShare && navigator.share) {
+        try {
+            const file = new File([dataString], fileName, { type: "application/json" });
+            await navigator.share({
+                files: [file],
+                title: 'Backup Bear Trap Tracker',
+                text: 'Data Backup BTT Pro'
+            });
+        } catch (err) {
+            // Jika share dibatalkan atau gagal, fallback ke download biasa
+            console.log("Share failed/cancelled, trying download...");
+            downloadFile(dataString, fileName);
+        }
+    } else {
+        // Mode PC/Laptop atau Browser jadul
+        downloadFile(dataString, fileName);
+    }
+}
+
+// Fungsi pembantu untuk download konvensional
+function downloadFile(content, fileName) {
+    const blob = new Blob([content], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
 }
 
 function importData(event) {
