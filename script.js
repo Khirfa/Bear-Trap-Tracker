@@ -219,7 +219,7 @@ async function shareDataMobile() {
 // Fungsi bantu untuk Copy ke Clipboard
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-        alert("Fitur Share tidak didukung. Data backup telah disalin ke CLIPBOARD. Silakan tempel (paste) di WA/Catatan.");
+        alert("Copas data ke WA atau catatan");
     }).catch(() => {
         alert("Gagal menyalin data.");
     });
