@@ -26,9 +26,12 @@
             </button>
 
             <button class="btn btn-sm btn-outline-primary fw-bold px-3" onclick="exportFullBackup()">📦 Backup</button>
-            
-            <button class="btn btn-sm btn-light fw-bold" onclick="document.getElementById('importFile').click()">📤 Import</button>
             <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
+			<div class="d-flex gap-2 align-items-center">
+				<button class="btn btn-sm btn-light fw-bold" onclick="importViaText()">📋 Paste</button>
+				<button class="btn btn-sm btn-light fw-bold" onclick="document.getElementById('importFile').click()">📤 Import</button>
+				<input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
+			</div>
         </div>
     </div>
 </nav>
@@ -40,8 +43,8 @@
             <div class="col-md-11">
                 <div class="row g-3 mb-4 text-center">
                     <div class="col-md-6">
-                        <label class="form-label small fw-bold text-muted">UID (ID UNIK)</label>
-                        <input type="text" id="charUID" class="form-control text-center" placeholder="ID Pemain (Smart Fill)" oninput="checkUID(this.value)">
+                        <label class="form-label small fw-bold text-muted">UID</label>
+                        <input type="text" id="charUID" class="form-control text-center" placeholder="ID Pemain" oninput="checkUID(this.value)">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-bold text-muted">NICKNAME</label>
