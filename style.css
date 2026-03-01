@@ -132,3 +132,51 @@ body {
 .note-box { font-size: 0.75rem; color: #718096; background: #fffdf5; padding: 8px; border-radius: 6px; border: 1px solid #fff5f5; }
 
 .search-sticky { top: 10px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important; }
+
+.watermark-name {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.watermark-name:hover {
+    color: #0096c7 !important; /* Warna sedikit lebih gelap saat hover */
+}
+
+/* Tooltip UID */
+.tooltip-uid {
+    visibility: hidden;
+    width: 140px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Muncul di atas nama */
+    left: 50%;
+    margin-left: -70px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.7rem;
+    font-weight: normal;
+}
+
+/* Panah kecil di bawah tooltip */
+.tooltip-uid::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.watermark-name:hover .tooltip-uid {
+    visibility: visible;
+    opacity: 1;
+}
