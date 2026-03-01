@@ -296,3 +296,21 @@ function processImport(imported) {
         alert("Data berhasil diperbarui!");
     }
 }
+
+function copyUID(uid, element) {
+    navigator.clipboard.writeText(uid).then(() => {
+        // Ubah teks tooltip sementara untuk memberi feedback
+        const tooltip = element.querySelector('.tooltip-uid');
+        const originalText = tooltip.innerText;
+        
+        tooltip.innerText = "✅ UID Berhasil Disalin!";
+        tooltip.style.backgroundColor = "#28a745"; // Warna hijau sukses
+        
+        setTimeout(() => {
+            tooltip.innerText = originalText;
+            tooltip.style.backgroundColor = "#333";
+        }, 2000);
+    }).catch(err => {
+        console.error('Gagal menyalin: ', err);
+    });
+}
