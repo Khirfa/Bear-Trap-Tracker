@@ -46,7 +46,7 @@
                 <div class="row g-3 mb-4 text-center">
                     <div class="col-md-6">
                         <label class="form-label small fw-bold text-muted">UID</label>
-                        <input type="text" id="charUID" class="form-control text-center" placeholder="ID Pemain" oninput="checkUID(this.value)">
+                        <input type="text" id="charUID" inputmode="numeric" class="form-control text-center" placeholder="ID Pemain" oninput="checkUID(this.value)">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-bold text-muted">NICKNAME</label>
@@ -146,16 +146,16 @@
                     <div id="manualContainer" class="d-none mb-3">
                         <input type="date" id="manualDateInput" class="form-control text-center">
                     </div>
-                    <div class="round-row"><span class="round-label">R1</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R2</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R3</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R4</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R5</span><input type="text" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R1</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R2</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R3</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R4</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+                    <div class="round-row"><span class="round-label">R5</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label small fw-bold text-muted d-block text-center">CATATAN</label>
-                    <input type="text" id="charNote" class="form-control text-center" placeholder="Keterangan Tambahan...">
+                    <input type="text" id="charNote" class="form-control text-center" placeholder="Keterangan Tambahan misalnya buff 20%">
                 </div>
 
                 <button class="btn btn-update shadow-sm" onclick="saveData()">UPDATE DATA</button>
@@ -193,5 +193,19 @@
         </div>
     </div>
 </div>
+<footer class="text-center py-4 mt-5 mb-3">
+    <div class="container">
+        <hr class="mb-4 opacity-25"> 
+        <div class="watermark-container">
+            <span class="text-muted small">Created by </span>
+            <span class="fw-bold text-primary watermark-name" 
+                  title="Klik 2x untuk salin UID"
+                  ondblclick="copyUID('165313484', this)">
+                Khirfa
+                <span class="tooltip-uid">UID: 165313484</span>
+            </span>
+        </div>
+    </div>
+</footer>
 </body>
 </html>
