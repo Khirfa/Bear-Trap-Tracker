@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bear Trap Tracker</title>
+    <title>BTT by Khirfa</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -46,7 +46,6 @@
         </div>
     </div>
 </nav>
-
 <div class="container container-custom">
     <div class="glass-card mb-5">
         <div class="section-title"><span>—</span> INPUT DATA SERANGAN <span>—</span></div>
@@ -55,11 +54,15 @@
                 <div class="row g-3 mb-4 text-center">
                     <div class="col-md-6">
                         <label class="form-label small fw-bold text-muted">UID</label>
-                        <input type="text" id="charUID" inputmode="numeric" class="form-control text-center" placeholder="ID Pemain" oninput="checkUID(this.value)">
+						<div class="input-box-clean">
+                        <input type="text" id="charUID" class="form-control text-center" placeholder="ID Pemain" oninput="checkUID(this.value)">
+						</div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-bold text-muted">NICKNAME</label>
+						<div class="input-box-clean">
                         <input type="text" id="charName" class="form-control text-center" placeholder="Nama Karakter">
+						</div>
                     </div>
                 </div>
 
@@ -156,30 +159,31 @@
                         <input type="date" id="manualDateInput" class="form-control text-center">
                     </div>
                     <div class="round-row"><span class="round-label">R1</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R2</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R3</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R4</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                    <div class="round-row"><span class="round-label">R5</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
-                </div>
+					<div class="round-row"><span class="round-label">R2</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+					<div class="round-row"><span class="round-label">R3</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+					<div class="round-row"><span class="round-label">R4</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+					<div class="round-row"><span class="round-label">R5</span><input type="text" inputmode="numeric" class="form-control dmg-input" placeholder="0" oninput="formatNumber(this)"></div>
+				</div>
 
                 <div class="mb-4">
                     <label class="form-label small fw-bold text-muted d-block text-center">CATATAN</label>
-                    <input type="text" id="charNote" class="form-control text-center" placeholder="Contoh buff 20%">
+					<div class="input-group search-box-clean">
+                    <input type="text" id="charNote" class="form-control text-center" placeholder="Contoh 20% Buff">
+					</div>
                 </div>
 
                 <button class="btn btn-update shadow-sm" onclick="saveData()">UPDATE DATA</button>
             </div>
         </div>
     </div>
-
-    <div class="glass-card mb-4 p-3 shadow-sm sticky-top search-sticky">
-        <div class="input-group">
-            <span class="input-group-text bg-white border-end-0">🔍</span>
-            <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Cari UID atau Nickname..." oninput="renderData()">
-        </div>
-        <div id="searchStats" class="text-center small text-muted mt-2 fw-bold"></div>
+	<div class="container container-custom">
+    <div class="glass-card mb-4 p-3 shadow-sm search-statis">
+    <div class="input-group search-box-clean">
+        <span class="input-group-text">🔍</span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Cari UID atau Nickname..." oninput="renderData()">
     </div>
-
+    <div id="searchStats" class="text-center small text-muted mt-2 fw-bold"></div>
+	</div>
     <div id="displayArea"></div>
 </div>
 
